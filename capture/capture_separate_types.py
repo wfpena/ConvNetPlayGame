@@ -3,10 +3,15 @@ from mss import mss
 import numpy as np
 import keyboard
 import os
-import time
 import skimage.measure
 
 from test_sqlite.test_sqlite import SequenceImg
+
+'''
+    This is used to capture different types of courses in the game
+    and label between 5 types, that will be labeled from 0 to 4
+    according to the key that is pressed
+'''
 
 def preprocessing(img):
     img = img[::,75:615]
@@ -23,11 +28,10 @@ def empty_folder(folder):
         try:
             if os.path.isfile(file_path):
                 os.unlink(file_path)
-            #elif os.path.isdir(file_path): shutil.rmtree(file_path)
         except Exception as e:
             print(e)
 
-folder_path = r'./images_type3'
+folder_path = r'./game_course_types'
 
 if not os.path.exists(folder_path):
     os.mkdir(folder_path)
@@ -36,8 +40,7 @@ if not os.path.exists(folder_path):
 
 sq = SequenceImg()
 
-# Contando quantas imagens já existem no folder para
-# colocar o current a partir desse número
+# Counting the number of images already in the folder
 x = 0
 for f in os.listdir(folder_path):
     if(os.path.splitext(f)[1][1:] == 'jpg'):
@@ -57,11 +60,6 @@ def start():
         'height': 550,
     }
 
-    # if not os.path.exists(folder_path):
-    #     os.mkdir(folder_path)
-    #else:
-    #    empty_folder(folder_path)
-
     with open(folder_path + '/actions.csv', 'a') as csv:
         x = 0
         space_pressed = False
@@ -74,7 +72,6 @@ def start():
                 print('0')
                 sq.increment_sq()
                 space_pressed = False
-                #x += 1
 
             if keyboard.is_pressed('1') and not space_pressed:
                 cv2.imwrite('{1}/frame_{0}.jpg'.format(sq.get_current(), folder_path), img)
@@ -82,20 +79,12 @@ def start():
                 print('1')
                 sq.increment_sq()
                 space_pressed = False
-                # x += 1
-
-                    # cv2.imwrite('{1}/frame_{0}.jpg'.format(sq.get_current(), folder_path), img_before)
-                # csv.write('0\n')
-                # print('before')
-                # sq.increment_sq()
 
             if keyboard.is_pressed('2'):
                 cv2.imwrite('{1}/frame_{0}.jpg'.format(sq.get_current(), folder_path), img)
                 csv.write('2\n')
                 print('Two')
                 sq.increment_sq()
-                #space_pressed = True
-                #x += 1
 
             if keyboard.is_pressed('3'):
                 cv2.imwrite('{1}/frame_{0}.jpg'.format(sq.get_current(), folder_path), img)
@@ -103,7 +92,6 @@ def start():
                 print('Three')
                 sq.increment_sq()
                 space_pressed = False
-                #x += 1
 
             if keyboard.is_pressed('4'):
                 cv2.imwrite('{1}/frame_{0}.jpg'.format(sq.get_current(), folder_path), img)
@@ -116,7 +104,5 @@ def start():
                 csv.close()
                 cv2.destroyAllWindows()
                 break
-
-            img_before = img
 
 start()

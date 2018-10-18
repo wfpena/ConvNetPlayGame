@@ -3,10 +3,18 @@ from mss import mss
 import numpy as np
 import keyboard
 import os
-import time
 import skimage.measure
 
 from test_sqlite.test_sqlite import SequenceImg
+
+'''
+    This script is used to capture frames from the game,
+    by pressing:
+    a       -> Do nothing
+    space   -> shooting (labeled 1 in a csv file called actions.csv)
+    e       -> Create a frame with label 1 without actually shooting
+    q       -> stop the script
+'''
 
 def preprocessing(img):
     img = img[::,75:615]
@@ -23,21 +31,17 @@ def empty_folder(folder):
         try:
             if os.path.isfile(file_path):
                 os.unlink(file_path)
-            #elif os.path.isdir(file_path): shutil.rmtree(file_path)
         except Exception as e:
             print(e)
 
-folder_path = r'./images15_one_and_zero'
+folder_path = r'./game_frames'
 
 if not os.path.exists(folder_path):
     os.mkdir(folder_path)
-# else:
-#    empty_folder(folder_path)
 
 sq = SequenceImg()
 
-# Contando quantas imagens já existem no folder para
-# colocar o current a partir desse número
+# Counting the number of images already in the folder
 x = 0
 for f in os.listdir(folder_path):
     if(os.path.splitext(f)[1][1:] == 'jpg'):
@@ -57,13 +61,7 @@ def start():
         'height': 550,
     }
 
-    # if not os.path.exists(folder_path):
-    #     os.mkdir(folder_path)
-    #else:
-    #    empty_folder(folder_path)
-
     with open(folder_path + '/actions.csv', 'a') as csv:
-        x = 0
         space_pressed = False
         while True:
             img = preprocessing(np.array(sct.grab(coordinates)))
@@ -74,12 +72,6 @@ def start():
                 print('space')
                 sq.increment_sq()
                 space_pressed = False
-                #x += 1
-
-                # cv2.imwrite('{1}/frame_{0}.jpg'.format(sq.get_current(), folder_path), img_before)
-                # csv.write('0\n')
-                # print('before')
-                # sq.increment_sq()
 
             # Press 'e' to hit a correct prediction but without actually shooting
             if keyboard.is_pressed('e'):
@@ -87,8 +79,6 @@ def start():
                 csv.write('1\n')
                 print('space - e')
                 sq.increment_sq()
-                #space_pressed = True
-                #x += 1
 
             if keyboard.is_pressed('d'):
                 space_pressed = False
@@ -102,13 +92,10 @@ def start():
                 print('nothing')
                 sq.increment_sq()
                 space_pressed = False
-                #x += 1
 
             if keyboard.is_pressed('q'):
                 csv.close()
                 cv2.destroyAllWindows()
                 break
-
-            img_before = img
 
 start()
